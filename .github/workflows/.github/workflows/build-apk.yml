@@ -1,0 +1,26 @@
+
+name: Build SCHNEIDER SOLAR APK
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get project files
+        uses: actions/checkout@v4
+
+      - name: Build Android APK
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          workdir: .
+          buildozer_version: stable
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCHNEIDER-SOLAR-APK
+          path: ${{ steps.buildozer.outputs.filename }}
+          
