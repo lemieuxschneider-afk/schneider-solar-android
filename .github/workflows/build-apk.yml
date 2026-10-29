@@ -24,3 +24,48 @@ jobs:
           name: SCHNEIDER-SOLAR-APK
           path: ${{ steps.buildozer.outputs.filename }}
           
+
+name: Build SCHNEIDER SOLAR APK
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Get project files
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip \
+            autoconf libtool pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev \
+            cmake libffi-dev libssl-dev
+
+      - name: Install Buildozer
+        run: |
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user buildozer cython==0.29.33
+
+      - name: Build APK
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          buildozer android debug
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCHNEIDER-SOLAR-APK
+          path: bin/*.apk
+          if-no-files-found: error
+          
